@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:id="@+id/grid_layout">   
+      <ImageView
+       android:id="@+id/grid_image"
+       android:layout_width="90dp"
+       android:paddingTop="25dp"
+       android:paddingLeft="15dp"
+       android:paddingRight="15dp"
+       android:paddingBottom="5dp"
+       
+       android:layout_height="66dp"
+       android:layout_gravity="center_horizontal"
+       android:src="@android:color/white"
+      android:background="@drawable/folder"
+       />
+      <TextView
+           android:id="@+id/gridtext"
+           android:layout_width="fill_parent"
+           android:layout_height="wrap_content"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/shelf_strip"
+           android:singleLine="true"
+           android:text="Bike"
+           android:layout_marginTop="-15dp"
+           android:textColor="@android:color/black"
+           android:textSize="15dp" />
+  
+   
+</LinearLayout>

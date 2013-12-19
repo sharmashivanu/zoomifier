@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/backgorund" >
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/header_image">
+        <TextView
+            android:id="@+id/header_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Sign In"
+            android:textColor="@android:color/white"
+          />
+    </RelativeLayout>
+   <ScrollView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/header"
+        android:layout_toLeftOf="@+id/lign">
+    <RelativeLayout
+        android:id="@+id/sign_in_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+         >
+        <TextView
+            android:id="@+id/logintext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+         
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:text="Already Registered at Zoomifier?"
+            android:textColor="#546075"
+            android:textSize="18dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <EditText
+            android:id="@+id/signin_username"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logintext"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Email address"
+            android:text=""
+          
+            android:singleLine="true" >
+            </EditText>
+
+        <EditText
+            android:id="@+id/signin_password"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signin_username"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:hint="Password  "
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:text=""
+           />
+
+        <TextView
+            android:id="@+id/forgot_password_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signin_password"
+            android:layout_centerHorizontal="true"
+            android:text="Forgot Username or Password ?"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="35dp"
+            android:layout_marginRight="10dp"         
+            android:textColor="#546075"
+             />
+
+        <Button
+            android:id="@+id/signin_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/forgot_password_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="30dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/button_background"
+            android:text="Sign In"
+            android:textSize="22dp" />
+        <TextView 
+            android:visibility="invisible"
+           android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signin_btn"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+    </RelativeLayout>
+</ScrollView>
+    <RelativeLayout
+        android:id="@+id/lign"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/header"
+   
+        android:layout_centerHorizontal="true"
+        
+        android:background="@drawable/line" >
+    </RelativeLayout>
+  <ScrollView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/header"
+            android:layout_toRightOf="@+id/lign">
+    <RelativeLayout
+        android:id="@+id/sign_up_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       >
+      
+        <TextView
+            android:id="@+id/signup_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="SignUp for free Zoomifier Account "
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="#546075"
+            android:textSize="18dp"
+         />
+
+        <EditText
+            android:id="@+id/signup_username"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signup_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:singleLine="true"
+            android:hint="Email address" />
+       <EditText 
+           android:id="@+id/first_name"
+           android:layout_width="fill_parent"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/signup_username"
+           android:layout_centerHorizontal="true"
+           android:layout_marginTop="10dp"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:singleLine="true"
+           android:hint="First Name"
+           
+           />
+       <EditText 
+           android:id="@+id/last_name"
+           android:layout_width="fill_parent"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/first_name"
+           android:layout_centerHorizontal="true"
+           android:layout_marginTop="10dp"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:singleLine="true"
+           android:hint="Last Name"
+           
+           />
+       <EditText 
+           android:id="@+id/company_name"
+           android:layout_width="fill_parent"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/last_name"
+           android:layout_centerHorizontal="true"
+           android:layout_marginTop="10dp"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:singleLine="true"
+           android:hint="Company Name"
+           
+           />
+        <EditText
+            android:id="@+id/signup_password"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/company_name"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Password  "
+            android:inputType="textPassword"
+             android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/signup_verifypassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signup_password"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Verify password  "
+            android:singleLine="true"
+            android:inputType="textPassword"  />
+
+      <!--   <CheckBox
+            android:id="@+id/content_publisher"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signup_verifypassword"
+            android:layout_centerHorizontal="true"
+            android:text="Send me special offers from Zoomifire Content publishers"
+            android:textColor="@android:color/black"
+            
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <CheckBox
+            android:id="@+id/party_partner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/content_publisher"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Send me promotions offers from Zoomifire&apos;s third party partner"
+            />
+ -->
+        <Button
+            android:id="@+id/sign_up"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signup_verifypassword"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_background"
+            android:text="Sign Up"
+            android:textSize="22dp" />
+        <TextView 
+           android:visibility="invisible"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sign_up"
+            android:layout_centerHorizontal="true"
+            android:text="By Clicking Sign Up you indicate that you have read and agreed to the Terms of Use and Privacy Policy"
+            android:textSize="20sp"
+            android:textColor="#546075"
+            android:maxLines="3"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="10dp" />
+      
+    </RelativeLayout>
+  </ScrollView>
+</RelativeLayout>

@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:id="@+id/headerlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <LinearLayout
+            android:id="@+id/zoomifire_header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal"
+            android:background="@android:color/black"
+            android:weightSum="8" >
+           <EditText
+            android:id="@+id/search_speaker_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/txtbg"
+            android:layout_marginRight="20dp"
+            android:drawableLeft="@drawable/search_icon"
+            android:ems="5"
+            
+            android:layout_weight="1"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:singleLine="true" 
+            android:layout_toLeftOf="@+id/headertext">
+
+        </EditText>
+            
+      
+            <TextView
+                android:id="@+id/headertext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               android:gravity="center_horizontal"
+                android:layout_weight="7"
+                android:text="Zoomifier"
+                android:textSize="10dp" 
+                
+                android:visibility="invisible"/>
+            
+            <Button 
+                android:id="@+id/barcode_scane"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                 android:layout_weight=".2"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/barcode_icon"/>
+
+            <Button
+                android:id="@+id/setting_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                 android:layout_weight=".2"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/settings_icon" />
+            
+            
+        </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/grid_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/zoomifire_header"
+              android:background="@drawable/shelf_bg" >
+          
+            <GridView
+                android:id="@+id/grid_view"
+                android:layout_marginTop="10dp"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginRight="-6dp"
+                android:layout_marginLeft="-6dp"
+                android:numColumns="4"
+                android:listSelector="#00000000"
+                >
+            </GridView>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/setting_dialog_layout"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/zoomifire_header"
+            android:background="@drawable/dialog_box"
+            android:layout_marginRight="20dp"
+            android:visibility="gone"
+            >
+              <RelativeLayout
+                android:id="@+id/header"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                 >
+
+                <TextView
+                    android:id="@+id/header_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="Setting"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                   
+                    android:textColor="@android:color/white" />
+            </RelativeLayout>
+            <RelativeLayout
+                    android:id="@+id/sign_in_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/header"
+                  
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="@drawable/inner_box"
+                    >
+                    <TextView
+                        android:id="@+id/setting_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="13dp"
+                        android:layout_marginTop="10dp"
+                        android:text="My Account"
+                        android:textColor="#546075"
+                        android:textSize="18dp" />
+                    <Button
+                        android:id="@+id/email_field"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/setting_text"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                      
+                        android:singleLine="true"
+                        android:text="rajesh.k@parangat.com  (sign out)"
+                        android:textSize="15dp" />
+
+                    <Button
+                        android:id="@+id/chan_userinfo_btn"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_below="@+id/email_field"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/button_background"
+                        android:text="Change User Info" />
+                     <TextView
+                       
+                        android:layout_width="wrap_content"
+                        android:layout_height="2dp"
+                        android:layout_below="@+id/chan_userinfo_btn"
+                        android:layout_alignParentLeft="true"
+                     
+                        android:visibility="invisible"
+                        android:textColor="@android:color/black"
+                        />
+                </RelativeLayout>
+                <TextView
+                        android:id="@+id/setting_text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/sign_in_layout"
+                        android:layout_alignParentLeft="true"
+                   
+                        android:layout_marginTop="10dp"
+                        android:visibility="invisible"
+                        android:textColor="@android:color/black"
+                        />
+            
+            </RelativeLayout>
+
+        <!-- <RelativeLayout
+            android:id="@+id/setting_dialog_layout"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/zoomifire_header"
+            android:background="@drawable/dialog_box"
+            android:layout_marginRight="20dp"
+            android:visibility="visible"
+            >
+           <ImageView 
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/poing_view"
+               android:layout_alignParentRight="true"
+               android:layout_marginRight="2dp"
+               android:layout_alignParentTop="true"
+               android:src="@drawable/triangle"/>
+         
+            <RelativeLayout
+                android:id="@+id/header"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/poing_view"
+                android:background="@drawable/setting_header" >
+
+                <TextView
+                    android:id="@+id/header_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="Setting"
+                    android:textSize="15sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@android:color/white" />
+            </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+          
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/header"
+            android:background="#0B0B3B"
+             >
+           <ScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:background="#cccccc"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="1dp" >
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:background="#cccccc"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="1dp" >
+                
+                <RelativeLayout
+                    android:id="@+id/sign_in_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true" >
+                    <TextView
+                        android:id="@+id/setting_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:text="My Account"
+                        android:textColor="@android:color/white"
+                        android:textSize="18dp" />
+                    <Button
+                        android:id="@+id/email_field"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/setting_text"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:singleLine="true"
+                        android:text="rajesh.k@parangat.com  (sign out)"
+                        android:textSize="15dp" />
+
+                    <Button
+                        android:id="@+id/chan_userinfo_btn"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_below="@+id/email_field"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/button_background"
+                        android:text="Change User Info" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/memory_details_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dp"
+                    android:layout_below="@+id/sign_in_layout"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/white" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="Local Storage" />
+
+                    <TextView
+                        android:id="@+id/mb_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:text="MB" />
+
+                    <EditText
+                        android:id="@+id/mb_edit_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_toLeftOf="@+id/mb_text_view"
+                        android:hint="00"
+                        android:numeric="integer"
+                        android:singleLine="true" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/facebook_details"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/memory_details_layout"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/white" >
+
+                    <TextView
+                        android:id="@+id/viewr_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="5dp"
+                        android:text="View Intro to Zoomifier Viewer"
+                        android:textColor="@android:color/black" />
+
+                    <ImageView
+                        android:id="@+id/dialog_line"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/viewr_textview"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/dialog_line" />
+
+                    <TextView
+                        android:id="@+id/viewr_facebook_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/dialog_line"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="5dp"
+                        android:text="Send Facebook"
+                        android:textColor="@android:color/black" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="2dp"
+                    android:background="#0B0B3B"
+                    android:layout_below="@+id/sign_in_layout"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="2dp"
+                    android:visibility="visible" />
+            </RelativeLayout>
+            </ScrollView>
+        </RelativeLayout>
+     
+        </RelativeLayout> -->
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/popupview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:visibility="gone" >
+
+        <RelativeLayout
+            android:id="@+id/popup_header"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+              android:background="@android:color/black" >
+
+            <TextView
+                android:id="@+id/poup_header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:textSize="25dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/popup_header" >
+
+            <GridView
+                android:id="@+id/popup_grid_view"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:verticalSpacing="50dp"
+                android:background="@drawable/shelf_bg"
+                android:numColumns="4" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/webview_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:visibility="gone" >
+
+        <RelativeLayout
+            android:id="@+id/popup_header"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+              android:background="@android:color/black" >
+
+            <TextView
+                android:id="@+id/document_header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="Document Name"
+                android:textSize="25dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/popup_header"
+            android:background="@android:color/white" >
+
+            <ImageView
+                android:id="@+id/webview"
+                android:scaleType="matrix"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

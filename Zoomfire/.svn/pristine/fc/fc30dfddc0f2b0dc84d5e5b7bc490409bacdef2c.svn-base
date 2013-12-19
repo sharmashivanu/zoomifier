@@ -1,0 +1,425 @@
+package com.zoomactivity;
+
+import java.util.List;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.util.FloatMath;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.Gallery;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class GridActivity extends Activity{
+	GridView gridView,popupGridView;
+	
+	    RelativeLayout layout;
+	    Animation popupAnimation,zoomInAnimation,zoomOutAnimation,zoomInPopupAnimation;
+	    RelativeLayout headerLayout,popupView;
+	    int status = 0;
+	    Button settingButton;
+		Matrix matrix = new Matrix();
+		Matrix savedMatrix = new Matrix();
+		PointF start = new PointF();
+		public static PointF mid = new PointF();
+		public static final int NONE = 0;
+		public static final int DRAG = 1;
+		public static final int ZOOM = 2;
+		public static int mode = NONE;
+		public static int i = 0;
+
+		float oldDist;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.grid_layout);
+		gridView=(GridView) findViewById(R.id.grid_view);
+		popupGridView=(GridView) findViewById(R.id.popup_grid_view);
+		GridAdapter adapter=new GridAdapter(this);
+		gridView.setAdapter(adapter);
+		settingButton=(Button) findViewById(R.id.setting_button);
+		settingButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+			  Dialog settingDialog=new Dialog(GridActivity.this,android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+			 settingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		     settingDialog.setContentView(R.layout.setting_dialog);
+		     settingDialog.setCanceledOnTouchOutside(false);
+		     settingDialog.getWindow().setGravity(Gravity.TOP|Gravity.RIGHT);
+			 settingDialog.getWindow().setLayout(300, 600);
+			
+				
+				settingDialog.show();
+			}
+		});
+		popupView=(RelativeLayout) findViewById(R.id.popupview);
+		zoomOutAnimation= AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_out_animation);
+		headerLayout=(RelativeLayout) findViewById(R.id.headerlayout);
+		popupAnimation = AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.sat_item_anim_click);
+		zoomInAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_in_animation);
+		
+		zoomInPopupAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_in_popupview);
+		popupGridView.setOnTouchListener(new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+
+				status = 1;
+		
+				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_DOWN:
+
+					savedMatrix.set(matrix);
+					start.set(event.getX(), event.getY());
+
+					mode = DRAG;
+					break;
+				case MotionEvent.ACTION_POINTER_DOWN:
+
+					oldDist = spacing(event);
+
+					if (oldDist > 10f) {
+
+						savedMatrix.set(matrix);
+						midPoint(mid, event);
+						mode = ZOOM;
+
+					}
+					break;
+
+				case MotionEvent.ACTION_MOVE:
+
+					 if (mode == ZOOM) {
+
+						float newDist = spacing(event);
+
+						if (newDist > 10f) {
+
+
+							popupView.startAnimation(zoomInPopupAnimation);
+						}
+					}
+					break;
+				case MotionEvent.ACTION_UP:
+					break;
+				case MotionEvent.ACTION_POINTER_UP:
+
+					mode = NONE;
+
+					break;
+				}
+				
+
+				return true;
+
+			}
+		});
+		
+		zoomInPopupAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				
+				popupView.setVisibility(View.GONE);
+				headerLayout.setVisibility(View.VISIBLE);
+				layout.startAnimation(zoomInAnimation);
+			}
+		});
+		
+	    /*gridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				popupView.setVisibility(View.VISIBLE);
+				popupView.startAnimation(popupAnimation);
+				headerLayout.setVisibility(View.GONE);
+				
+			}
+		});*/
+		zoomOutAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				headerLayout.setVisibility(View.GONE);
+				popupView.setVisibility(View.VISIBLE);
+			    NewGridAdapter newAdapter=new NewGridAdapter(GridActivity.this);
+			    popupGridView.setAdapter(newAdapter);
+				
+				
+			}
+		});
+	   popupAnimation.setAnimationListener(new AnimationListener() {
+		
+		@Override
+		public void onAnimationStart(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			//popupView.setVisibility(View.VISIBLE);
+			popupView.startAnimation(zoomOutAnimation);
+			//headerLayout.setVisibility(View.GONE);
+			
+		}
+	}) ;
+	    zoomInAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				//popupView.setVisibility(View.GONE);
+				
+			}
+		});
+	   
+	}
+	public class GridAdapter extends BaseAdapter {
+
+		private Activity activity;
+		private LayoutInflater inflater;
+		
+
+		public GridAdapter(Activity activity) {
+			this.activity = activity;
+			inflater = (LayoutInflater) activity
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+                                                                                        
+		@Override
+		public int getCount() {
+		
+			return 7;
+			 
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		
+
+		@Override
+		public View getView(final int position, View convertViewe, ViewGroup parent) {
+			
+			final ViewHolder holder;
+		 	 inflater = (LayoutInflater) GridActivity.this
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			  View convertView = inflater
+						.inflate(R.layout.gridview_item, null);
+				holder = new ViewHolder();
+				
+				holder.rlyt_friend = (RelativeLayout) convertView
+						.findViewById(R.id.grid_layout);
+				holder.occassionName = (TextView) convertView.findViewById(R.id.gridtext);
+				holder.imageview=(ImageView)convertView.findViewById(R.id.grid_image);
+				//holder.memberCount=(TextView) convertView.findViewById(R.id.memeber);
+		
+			 try{
+			
+		     //  holder.occassionName.setText(occassionList.get(position));
+		     
+			 }
+			 
+			 catch(Exception e)
+			 {
+				 e.printStackTrace();
+				 Log.i("Error Log=======", e.toString());
+			 }
+			 holder.rlyt_friend.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+				layout=null;	
+				layout=holder.rlyt_friend;
+			   holder.rlyt_friend.startAnimation(popupAnimation);
+				Log.i("postion",Integer.toString(position));
+			
+				
+				}
+			});
+			
+			return convertView;
+		}
+	}
+	public class ViewHolder {
+		public RelativeLayout rlyt_friend;
+		public ImageView imageview;
+		public TextView occassionName;
+		
+	}
+	public class NewGridAdapter extends BaseAdapter {
+
+		private Activity activity;
+		private LayoutInflater inflater;
+
+		public NewGridAdapter(Activity activity) {
+			this.activity = activity;
+			inflater = (LayoutInflater) activity
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+                                                                                        
+		@Override
+		public int getCount() {
+		
+			return 40;
+			 
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		
+
+		@Override
+		public View getView(final int position, View convertViewe, ViewGroup parent) {
+			
+			final ViewHolder holder;
+		 	 inflater = (LayoutInflater) GridActivity.this
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			  View convertView = inflater
+						.inflate(R.layout.gridview_item, null);
+				holder = new ViewHolder();
+				holder.rlyt_friend = (RelativeLayout) convertView
+						.findViewById(R.id.grid_layout);
+				holder.occassionName = (TextView) convertView.findViewById(R.id.gridtext);
+				holder.imageview=(ImageView)convertView.findViewById(R.id.grid_image);
+				//holder.memberCount=(TextView) convertView.findViewById(R.id.memeber);
+		
+			 try{
+			
+		     //  holder.occassionName.setText(occassionList.get(position));
+		     
+			 }
+			 
+			 catch(Exception e)
+			 {
+				 e.printStackTrace();
+				 Log.i("Error Log=======", e.toString());
+			 }
+			/* holder.rlyt_friend.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+				layout=null;	
+				layout=holder.rlyt_friend;
+				holder.rlyt_friend.startAnimation(popupAnimation);
+				Log.i("postion",Integer.toString(position));
+			
+				
+				}
+			});
+			 popupView.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						
+						
+						popupView.setVisibility(View.GONE);
+						headerLayout.setVisibility(View.VISIBLE);
+						layout.startAnimation(zoomInAnimation);
+						
+					}
+				});*/
+          
+			return convertView;
+		}
+	}
+	private float spacing(MotionEvent event) {
+		float x = event.getX(0) - event.getX(1);
+		float y = event.getY(0) - event.getY(1);
+		return FloatMath.sqrt(x * x + y * y);
+	}
+
+	private void midPoint(PointF point, MotionEvent event) {
+
+		float x = event.getX(0) + event.getX(1);
+		float y = event.getY(0) + event.getY(1);
+		point.set(x / 2, y / 2);
+	}
+
+}

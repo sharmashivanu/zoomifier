@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+   
+   
+     >
+      <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/header_image"
+        >
+
+        <TextView
+            android:id="@+id/header_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="User Info"
+            android:textColor="@android:color/white"
+          />
+    </RelativeLayout>
+   <RelativeLayout 
+      android:background="#cccccc"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/header">
+    <RelativeLayout
+        android:id="@+id/sign_in_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+       android:layout_alignParentTop="true"
+       
+       >
+
+        <TextView
+            android:id="@+id/setting_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            
+            android:text="My Account"
+            android:textColor="@android:color/white"
+            android:textSize="18dp" />
+
+        <EditText
+            android:id="@+id/email_field"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setting_text"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Email address"
+            android:textSize="20dp"
+            android:singleLine="true"
+             />
+
+     
+</RelativeLayout>
+<RelativeLayout
+    android:id="@+id/memory_details_layout"
+    android:layout_below="@+id/sign_in_layout" 
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:background="@android:color/white"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="10dp">
+    <TextView 
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:text="Local Storage"
+        android:layout_centerVertical="true"
+        
+        />
+     <TextView 
+        android:id="@+id/mb_text_view"
+        android:layout_height="wrap_content"
+       android:layout_width="wrap_content"
+       android:layout_centerVertical="true"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="10dp"
+       android:text="MB"
+       />
+   <EditText android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             android:id="@+id/mb_edit_textview"
+             android:hint="00"
+             android:singleLine="true"
+             android:layout_centerVertical="true"
+             android:layout_toLeftOf="@+id/mb_text_view"
+             android:layout_marginRight="5dp"
+             android:numeric="integer"
+             /> 
+   
+   
+</RelativeLayout>
+<RelativeLayout 
+    android:id="@+id/facebook_details"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_below="@+id/memory_details_layout"
+    android:layout_marginRight="10dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@android:color/white">
+   
+   <TextView android:layout_height="wrap_content"
+       android:id="@+id/viewr_textview"
+       android:layout_marginTop="5dp"
+       android:layout_width="wrap_content"
+       android:layout_alignParentTop="true"
+       android:layout_centerHorizontal="true"
+       android:textColor="@android:color/black"
+       android:text="View Intro to Zoomifire Viewer"/>
+   <ImageView 
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/viewr_textview"
+       android:layout_width="fill_parent"
+       android:layout_marginTop="5dp"
+       android:id="@+id/dialog_line"
+       android:src="@drawable/dialog_line"
+       />
+    <TextView android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="5dp"
+       android:id="@+id/viewr_facebook_text"
+       android:layout_width="wrap_content"
+       android:layout_below="@+id/dialog_line"
+       android:layout_centerHorizontal="true"
+       android:text="Send Facebook"/>
+    
+</RelativeLayout>
+<TextView android:layout_height="wrap_content"
+       android:textColor="@android:color/black"
+       android:layout_marginTop="2dp"
+       android:layout_width="wrap_content"
+       android:layout_below="@+id/facebook_details"
+       android:layout_centerHorizontal="true"
+       android:visibility="invisible"
+      />
+</RelativeLayout>
+    
+</RelativeLayout>

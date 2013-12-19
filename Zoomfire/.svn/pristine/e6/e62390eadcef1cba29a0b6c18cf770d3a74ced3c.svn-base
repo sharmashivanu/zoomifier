@@ -1,0 +1,1317 @@
+package com.zoomactivity;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.FloatMath;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.Gallery;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class GridActivity extends Activity{
+	GridView gridView,popupGridView;
+	
+	    RelativeLayout layout,webView_layout,layout2,setting_Dialog;
+	    Animation popupAnimation,zoomInAnimation,zoomOutAnimation,zoomInPopupAnimation,
+	    documentzoomInAnimation,documentZoomOutAnimation,webViewZoomOutAnimation,webViewZoomInAnimation;
+	    RelativeLayout headerLayout,popupView;
+	    TextView categoryHeader,documentHeader;
+	    
+	    int status = 0;
+	    Button settingButton;
+	    Button signOut;
+	    Button barCodeScaneButton;
+	    
+	    
+		Matrix matrix = new Matrix();
+		Matrix savedMatrix = new Matrix();
+		PointF start = new PointF();
+		public static PointF mid = new PointF();
+		public static final int NONE = 0;
+		public static final int DRAG = 1;
+		public static final int ZOOM = 2;
+		public static int mode = NONE;
+		public static int i = 0;
+		ProgressDialog progressDialog;
+		List<String> nameList=new ArrayList<String>();
+		List<Drawable> imageList=new ArrayList<Drawable>();
+		List<String> imagePathList=new ArrayList<String>();
+		String retrunResponse,categoryResponse,categoryHeaderName,documentHeaderName;
+		
+		String id,name;
+		String readerId,clientId,userEmail;
+		
+		
+		List<String> comapnyId=new ArrayList<String>();
+		List<String> companyName=new ArrayList<String>();
+		String documentWebViewUrl;
+		
+		
+		
+		List<String> documentId=new ArrayList<String>();
+		List<String> documentName=new ArrayList<String>();
+		List<String> documentDiscription=new ArrayList<String>();
+		List<String> documentOrginalId=new ArrayList<String>();
+		List<String> documentContentType=new ArrayList<String>();
+		List<String> documentContentWidth=new ArrayList<String>();
+		List<String> documentContentHeight=new ArrayList<String>();
+		List<String> documentOwnerId=new ArrayList<String>();
+		List<Drawable> homeImageList=new ArrayList<Drawable>();
+		List<Drawable> secondListImage=new ArrayList<Drawable>();
+		Drawable drwable;
+		
+		Dialog  settingDialog;
+		
+		
+		
+	    ImageView webView;
+	    boolean settingDialogSignal;
+		float oldDist;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.grid_layout);
+		com.google.zxing.client.android.CaptureActivity.barCode=null;
+		
+		Bundle bundle=getIntent().getExtras();
+		readerId=bundle.getString("readerId");
+		clientId=bundle.getString("clientId");
+		userEmail=bundle.getString("email_id");
+		init();
+		barCodeScaneButton=(Button) findViewById(R.id.barcode_scane);
+		barCodeScaneButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(GridActivity.this,
+						com.google.zxing.client.android.CaptureActivity.class);
+				
+				//i.putExtras(bundle);
+				com.google.zxing.client.android.CaptureActivity.barCode=null;
+				startActivity(i);
+				
+			}
+		});
+		webView=(ImageView) findViewById(R.id.webview);
+		settingDialogSignal=false;
+		signOut.setText("(sign out)  "+userEmail);
+		//Dialog Initialization===================
+		
+		
+		new loadList().execute();
+		settingDialog();
+		
+		categoryHeader=(TextView) findViewById(R.id.poup_header_text);
+		documentHeader=(TextView) findViewById(R.id.document_header_text);
+		setting_Dialog=(RelativeLayout) findViewById(R.id.setting_dialog_layout);
+		
+		webView_layout=(RelativeLayout) findViewById(R.id.webview_layout);
+		gridView=(GridView) findViewById(R.id.grid_view);
+		popupGridView=(GridView) findViewById(R.id.popup_grid_view);
+		
+		
+		//Setting Button Functionality========================================================
+		
+		settingButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				if(setting_Dialog.isShown())
+				{
+					setting_Dialog.setVisibility(View.GONE);
+				}
+				else
+				{
+					 setting_Dialog.setVisibility(View.VISIBLE);
+					 signOut=(Button) findViewById(R.id.email_field);
+					 signOut.setOnClickListener(new View.OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							 setting_Dialog.setVisibility(View.GONE);
+							Intent mainIntent=new Intent(GridActivity.this,MainActivity.class);
+							startActivity(mainIntent);
+							
+							finish();
+						}
+					});
+					 Button signUserInfo=(Button) findViewById(R.id.chan_userinfo_btn);
+					 signUserInfo.setOnClickListener(new View.OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							
+						   setting_Dialog.setVisibility(View.GONE);
+							
+							final Dialog userInfoDialog=new Dialog(GridActivity.this);
+							userInfoDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+							userInfoDialog.setContentView(R.layout.change_user_info);
+							
+							userInfoDialog.setCanceledOnTouchOutside(false);
+							userInfoDialog.getWindow().setLayout(400, 500);
+							userInfoDialog.show();
+							Button cancelButton=(Button) userInfoDialog.findViewById(R.id.cancel_button);
+							cancelButton.setOnClickListener(new View.OnClickListener() {
+								
+								@Override
+								public void onClick(View v) {
+									userInfoDialog.dismiss();
+									
+								}
+							});
+						
+							
+						}
+					});
+				}
+				
+		   }
+			
+			
+		});
+		
+		
+		
+		
+		
+		
+		popupView=(RelativeLayout) findViewById(R.id.popupview);
+		zoomOutAnimation= AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_out_animation);
+		headerLayout=(RelativeLayout) findViewById(R.id.headerlayout);
+		popupAnimation = AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.sat_item_anim_click);
+		
+		
+		zoomInPopupAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_in_popupview);
+		
+		documentzoomInAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_in_animation);
+		documentZoomOutAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.sat_item_anim_click);
+		documentZoomOutAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				
+				/*Intent documentIntent=new Intent(GridActivity.this,DocumentView.class);
+				startActivity(documentIntent);*/
+				popupView.setVisibility(View.GONE);
+				webView_layout.setVisibility(View.VISIBLE);
+				documentHeader.setText(documentHeaderName);
+				webView_layout.startAnimation(webViewZoomOutAnimation);
+				
+				
+			}
+		});
+		
+		
+		
+		//Categroy View TocuhListner=====================================================================
+
+		popupGridView.setOnTouchListener(new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+
+				status = 1;
+		
+				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_DOWN:
+
+					savedMatrix.set(matrix);
+					start.set(event.getX(), event.getY());
+
+					mode = DRAG;
+					break;
+				case MotionEvent.ACTION_POINTER_DOWN:
+
+					oldDist = spacing(event);
+
+					if (oldDist > 10f) {
+
+						savedMatrix.set(matrix);
+						midPoint(mid, event);
+						mode = ZOOM;
+
+					}
+					break;
+
+				case MotionEvent.ACTION_MOVE:
+
+					 if (mode == ZOOM) {
+						 Log.i("oldDist====",Float.toString(oldDist));
+						 
+
+						float newDist = spacing(event);
+                       float f=oldDist-newDist;
+						if (f > 200f) {
+							 Log.i("newDist====",Float.toString(newDist));
+
+							popupView.startAnimation(zoomInPopupAnimation);
+						}
+					}
+					break;
+				case MotionEvent.ACTION_UP:
+					break;
+				case MotionEvent.ACTION_POINTER_UP:
+
+					mode = NONE;
+
+					break;
+				}
+				
+
+				return true;
+
+			}
+		});
+		
+		
+		
+		
+		
+		//Document Touchlistner========================================================
+		
+		
+		webView.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				status = 1;
+				ImageView img = (ImageView) v;
+				ImageView view = (ImageView) v;
+				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_DOWN:
+
+					savedMatrix.set(matrix);
+					start.set(event.getX(), event.getY());
+
+					mode = DRAG;
+					break;
+				case MotionEvent.ACTION_POINTER_DOWN:
+
+					oldDist = spacing(event);
+
+					if (oldDist > 10f) {
+
+						savedMatrix.set(matrix);
+						midPoint(mid, event);
+						mode = ZOOM;
+
+					}
+					break;
+
+				case MotionEvent.ACTION_MOVE:
+
+					if (mode == DRAG) {
+
+						matrix.set(savedMatrix);
+						matrix.postTranslate(event.getX() - start.x,
+								event.getY() - start.y);
+					} else if (mode == ZOOM) {
+
+						float newDist = spacing(event);
+						  float f=oldDist-newDist;
+							if (f > 200f) {
+								webView_layout.startAnimation(webViewZoomInAnimation);
+								
+							}
+
+						if (newDist > 10f) {
+
+							matrix.set(savedMatrix);
+							float scale = newDist / oldDist;
+							matrix.postScale(scale, scale, mid.x, mid.y);
+						}
+					}
+					break;
+				case MotionEvent.ACTION_UP:
+					break;
+				case MotionEvent.ACTION_POINTER_UP:
+
+					mode = NONE;
+
+					break;
+				}
+				view.setImageMatrix(matrix);
+
+				return true;
+
+			}
+		});
+		
+		
+		
+		//Animation When Category view closed=====================
+		
+		zoomInPopupAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				
+				popupView.setVisibility(View.GONE);
+				headerLayout.setVisibility(View.VISIBLE);
+				layout.startAnimation(zoomInAnimation);
+			}
+		});
+		
+	    /*gridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				popupView.setVisibility(View.VISIBLE);
+				popupView.startAnimation(popupAnimation);
+				headerLayout.setVisibility(View.GONE);
+				
+			}
+		});*/
+		zoomOutAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				headerLayout.setVisibility(View.GONE);
+				
+				categoryHeader.setText(categoryHeaderName);
+				popupView.setVisibility(View.VISIBLE);
+				
+			    new LoadCategoryList().execute();
+				
+				
+			}
+		});
+		
+		
+		
+		
+		//Animation when zoomifire GridView item click===================================================================
+		
+	   popupAnimation.setAnimationListener(new AnimationListener() {
+		
+		@Override
+		public void onAnimationStart(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			//popupView.setVisibility(View.VISIBLE);
+			popupView.startAnimation(zoomOutAnimation);
+			//headerLayout.setVisibility(View.GONE);
+			
+		}
+	}) ;
+	   
+	   
+	   
+	   
+	   
+	   //Animation For Zoomout===================================================================================
+	   
+	   zoomInAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_in_animation);
+	    zoomInAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				//popupView.setVisibility(View.GONE);
+				
+			}
+		});
+	    
+	    
+	    
+	    
+	    //Animation When Document View Popup=============================================================
+	    
+	    webViewZoomOutAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_out_animation);
+	    webViewZoomOutAnimation.setAnimationListener(new AnimationListener() {
+		
+		@Override
+		public void onAnimationStart(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			//webView.loadUrl(documentWebViewUrl);
+			new LoadDocument().execute();
+		}
+	});
+	    
+	    
+	    
+	    //Animation When DocumentLayout Zoom In=========================================== 
+	    
+	   webViewZoomInAnimation=AnimationUtils.loadAnimation(GridActivity.this,
+				R.anim.zoom_in_popupview);
+	   webViewZoomInAnimation.setAnimationListener(new AnimationListener() {
+		
+		@Override
+		public void onAnimationStart(Animation animation) {
+			
+			
+		}
+		
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			
+			
+		}
+		
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			webView.setImageDrawable(null);
+			//LayoutParams param;
+		/*	param=(LayoutParams) webView.getLayoutParams();
+			param.width=LayoutParams.WRAP_CONTENT;
+			param.height=LayoutParams.WRAP_CONTENT;*/
+			webView_layout.setVisibility(View.GONE);
+			//webView.setLayoutParams(param);
+			//webView.loadUrl("");
+			popupView.setVisibility(View.VISIBLE);
+			layout2.startAnimation(zoomInAnimation);
+			
+			
+		}
+	});
+	   
+	   
+	}
+	
+	
+	
+	//GridView for Zoomifire======================================================
+	
+	
+	public class GridAdapter extends BaseAdapter {
+
+		private Activity activity;
+		private LayoutInflater inflater;
+		int number=0;
+		
+
+		public GridAdapter(Activity activity) {
+			this.activity = activity;
+			inflater = (LayoutInflater) activity
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+                                                                                        
+		@Override
+		public int getCount() {
+		    int modules=companyName.size()%4;
+		    if(modules==1)
+		    {	
+		    	
+			return companyName.size()+3;
+		    }
+		    else if(modules==2)
+		    {
+		    
+		    	return companyName.size()+2;
+		    }
+		    else if(modules==3)
+		    {
+		    
+		    	return companyName.size()+1;
+		    }
+		    else
+		    {
+		        
+			    	return companyName.size();
+			 
+		    }
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		
+
+		@Override
+		public View getView(final int position, View convertViewe, ViewGroup parent) {
+			
+			final ViewHolder holder;
+		 	 inflater = (LayoutInflater) GridActivity.this
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			  View convertView = inflater
+						.inflate(R.layout.gridview_item, null);
+				holder = new ViewHolder();
+				
+				holder.rlyt_friend = (RelativeLayout) convertView
+						.findViewById(R.id.grid_layout);
+				holder.occassionName = (TextView) convertView.findViewById(R.id.gridtext);
+				holder.imageview=(ImageView)convertView.findViewById(R.id.grid_image);
+				//holder.memberCount=(TextView) convertView.findViewById(R.id.memeber);
+				
+		
+		 try{
+			  if(position<companyName.size())
+			  {	  
+			
+		      holder.occassionName.setText(companyName.get(position)); 
+		      holder.imageview.setImageDrawable(homeImageList.get(position));
+		     
+			 }
+		   
+		   else
+		     {
+			   holder.occassionName.setVisibility(View.INVISIBLE);
+			   holder.imageview.setVisibility(View.INVISIBLE);
+		      }
+		 
+		   } 
+			 catch(Exception e)
+			 {
+				 e.printStackTrace();
+				 Log.i("Error Log=======", e.toString());
+			 }
+			 holder.imageview.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+				layout=null;
+				setting_Dialog.setVisibility(View.GONE);
+				layout=holder.rlyt_friend;
+				id=comapnyId.get(position);
+				 categoryHeaderName=companyName.get(position);
+				 holder.rlyt_friend.startAnimation(popupAnimation);
+				
+			
+				
+				}
+			});
+			
+			return convertView;
+		}
+	}
+	
+	
+	
+	//Holder=============================
+	
+	
+	public class ViewHolder {
+		public RelativeLayout rlyt_friend;
+		public ImageView imageview;
+		public TextView occassionName;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+// Category Grid view ===============================================================	
+	
+	
+	
+
+	public class NewGridAdapter extends BaseAdapter {
+
+		private Activity activity;
+		private LayoutInflater inflater;
+
+		public NewGridAdapter(Activity activity) {
+			this.activity = activity;
+			inflater = (LayoutInflater) activity
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+                                                                                        
+		@Override
+		public int getCount() {
+		    int modules=documentName.size()%4;
+		    if(modules==1)
+		    {	
+		    	
+			return documentName.size()+3;
+		    }
+		    else if(modules==2)
+		    {
+		    
+		    	return documentName.size()+2;
+		    }
+		    else if(modules==3)
+		    {
+		    
+		    	return documentName.size()+1;
+		    }
+		    else
+		    {
+		        
+			    	return documentName.size();
+			 
+		    }
+			
+			 
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		
+
+		@Override
+		public View getView(final int position, View convertViewe, ViewGroup parent) {
+			
+			final ViewHolder holder;
+		 	 inflater = (LayoutInflater) GridActivity.this
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			  View convertView = inflater
+						.inflate(R.layout.gridview_item, null);
+				holder = new ViewHolder();
+				holder.rlyt_friend = (RelativeLayout) convertView
+						.findViewById(R.id.grid_layout);
+				holder.occassionName = (TextView) convertView.findViewById(R.id.gridtext);
+				holder.imageview=(ImageView)convertView.findViewById(R.id.grid_image);
+				//holder.memberCount=(TextView) convertView.findViewById(R.id.memeber);
+		
+			 try{
+			  if(position<documentName.size())
+			  {
+		       holder.occassionName.setText(documentName.get(position));
+
+			     holder.imageview.setImageDrawable(secondListImage.get(position));
+			   
+			  }
+			  else{
+				  holder.imageview.setVisibility(View.INVISIBLE);
+				  holder.occassionName.setText(" ");
+			  }
+			 }
+			 
+			 catch(Exception e)
+			 {
+				 e.printStackTrace();
+				 Log.i("Error Log=======", e.toString());
+			 }
+			 holder.imageview.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					layout2=holder.rlyt_friend;
+				
+				  holder.rlyt_friend.startAnimation(documentZoomOutAnimation);	
+				   documentHeaderName=documentName.get(position);
+				   documentWebViewUrl="http://ve1.zoomifier.net/"+id+"/"+documentId.get(position)+"/ipad/Page1-1x.jpg";
+				}
+			});
+			/* popupView.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						
+						
+						popupView.setVisibility(View.GONE);
+						headerLayout.setVisibility(View.VISIBLE);
+						layout.startAnimation(zoomInAnimation);
+						
+					}
+				});*/
+          
+			return convertView;
+		}
+	}
+	private float spacing(MotionEvent event) {
+		float x = event.getX(0) - event.getX(1);
+		float y = event.getY(0) - event.getY(1);
+		return FloatMath.sqrt(x * x + y * y);
+	}
+
+	private void midPoint(PointF point, MotionEvent event) {
+
+		float x = event.getX(0) + event.getX(1);
+		float y = event.getY(0) + event.getY(1);
+		point.set(x / 2, y / 2);
+	}
+	
+	
+	
+	
+	
+	//Thread For  laoding  Zoomifire List===============================================================================
+	
+	
+	public class loadList extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			
+			  progressDialog = new ProgressDialog(GridActivity.this);
+			  progressDialog
+			  .setMessage("Please Wait.Downloading your data...");
+			  progressDialog.show();
+			  comapnyId.clear();
+			  companyName.clear();
+			   homeImageList.clear();
+			 
+			
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+
+		
+   			  
+   			   String document=
+   					  "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+   	    			 +"<request>" 
+   	    	   		 +"<operation opcode=\"GET_READER_CLIENTS\">"
+   	    			 +"<params readerid=\""+readerId+"\"/>"
+   	    	         +"</operation>"
+   	    			 +"</request>";
+        	   try {
+                   HttpClient httpclient = new DefaultHttpClient();
+                   HttpPost post = new HttpPost("http://ve1.zoomifier.net:8080/zoomifierws/rest/interface");
+                   StringEntity str = new StringEntity(document);
+                   str.setContentType("application/xml; charset=utf-8");
+                   str.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/xml; charset=utf-8"));
+                   post.setEntity(str);
+                   HttpResponse response = httpclient.execute(post);
+                   HttpEntity entity = response.getEntity();
+                   retrunResponse = EntityUtils.toString(entity);
+                 Log.i("Response for Get Reader Cliets=======",retrunResponse);
+                 } catch ( IOException ioe ) {
+                  ioe.printStackTrace();
+                 }
+        	   try{
+                
+        	    XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                factory.setNamespaceAware(true);
+                XmlPullParser xpp = factory.newPullParser();
+                 xpp.setInput( new StringReader (retrunResponse));
+                String str=retrunResponse;
+                int eventType = xpp.getEventType();
+                 while (eventType != XmlPullParser.END_DOCUMENT) {
+                if(eventType == XmlPullParser.START_DOCUMENT) {
+                    
+                } else if(eventType == XmlPullParser.START_TAG) {
+                    Log.i("Start tag ",xpp.getName());
+                    if(xpp.getName().equals("clients")){
+                    	
+                    }else if(xpp.getName().equals("client")){
+                    	  comapnyId.add(xpp.getAttributeValue(0));
+                    	  companyName.add(xpp.getAttributeValue(1));
+                    	 
+                    }
+                   
+                } else if(eventType == XmlPullParser.END_TAG) {
+                    
+                } else if(eventType == XmlPullParser.TEXT) {
+                    
+                }
+                eventType = xpp.next();
+               }
+               System.out.println("End document");
+        	   }
+        	   catch(Exception e)
+        	   {
+        		   e.printStackTrace();
+        	   }
+        	  for(int i=0;i<companyName.size();i++)
+        	   {
+        		   String url="http://ve1.zoomifier.net/"+comapnyId.get(i)+"/images/"+comapnyId.get(i)+".jpg";
+        		   homeImageList.add(LoadImageFromWebOperations(url));
+        	     }
+        	 
+        	   
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+
+			super.onProgressUpdate(values);
+
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			progressDialog.dismiss();
+			GridAdapter adapter=new GridAdapter(GridActivity.this);
+			gridView.setAdapter(adapter);
+		
+			
+	}
+
+}
+	
+	
+	
+	
+	
+	
+	
+	//Thead For Loading Category List ========================================================================================
+	
+	public class LoadCategoryList extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			
+			  progressDialog = new ProgressDialog(GridActivity.this);
+			  progressDialog
+			  .setMessage("Please Wait.Downloading your data...");
+			  progressDialog.show();
+			  documentName.clear();
+			  documentId.clear();
+			  documentOrginalId.clear();
+			  documentOwnerId.clear();
+			  documentDiscription.clear();
+			  documentContentWidth.clear();
+			  documentContentType.clear();
+			  documentContentHeight.clear();
+			  secondListImage.clear();
+			 
+			 
+			
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+
+			
+        	   /*String categoryRequest="<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+     	    			 +"<request>" 
+     	    	   		 +"<operation opcode=\"GET_ALL_CATEGORIES\">"
+     	    			 +"<params clientid=\""+id+"\"/>"
+     	    	         +"</operation>"
+     	    			 +"</request>";*/
+        	   
+        	   String categoryRequest="<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+	   	    			 +"<request>" 
+	   	    	   		 +"<operation opcode=\"GET_READER_DOCUMENTS\">"
+	   	    			 +"<params readerid=\""+readerId+"\" clientid=\""+id+"\"/>"
+	   	    	         +"</operation>"
+	   	    			 +"</request>";
+          	   try {
+                     HttpClient httpclient = new DefaultHttpClient();
+                     HttpPost post = new HttpPost("http://ve1.zoomifier.net:8080/zoomifierws/rest/interface");
+                     StringEntity str = new StringEntity(categoryRequest);
+                     str.setContentType("application/xml; charset=utf-8");
+                     str.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/xml; charset=utf-8"));
+                     post.setEntity(str);
+                     HttpResponse response = httpclient.execute(post);
+                     HttpEntity entity = response.getEntity();
+                     categoryResponse = EntityUtils.toString(entity);
+                    Log.i("Response for get All Category=========", categoryResponse);
+                   } catch ( IOException ioe ) {
+                    ioe.printStackTrace();
+                   }
+          	   try{
+                  
+          	      XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                  factory.setNamespaceAware(true);
+                  XmlPullParser xpp = factory.newPullParser();
+                   xpp.setInput( new StringReader (categoryResponse));
+                 Log.i("document id========================", categoryResponse);
+                  int eventType = xpp.getEventType();
+                   while (eventType != XmlPullParser.END_DOCUMENT) {
+                  if(eventType == XmlPullParser.START_DOCUMENT) {
+                      
+                      } else if(eventType == XmlPullParser.START_TAG) {
+                        Log.i("Start tag ",xpp.getName());
+                        if(xpp.getName().equals("documents")){
+                      	
+                         }else if(xpp.getName().equals("document")){
+                        	 
+                      	 documentId.add(xpp.getAttributeValue(0));
+                      	 documentName.add(xpp.getAttributeValue(1));
+                      	 documentDiscription.add(xpp.getAttributeValue(2));
+                      	 documentOrginalId.add(xpp.getAttributeValue(3));
+                      	 documentContentType.add(xpp.getAttributeValue(4));
+                      	 documentContentWidth.add(xpp.getAttributeValue(5));
+                      	 documentContentHeight.add(xpp.getAttributeValue(6));
+                      	 documentOwnerId.add(xpp.getAttributeValue(7));
+                      	 
+                      	  
+          
+                        }
+                     
+                  }
+                  
+                  else if(eventType == XmlPullParser.END_TAG) {
+                      
+                  } else if(eventType == XmlPullParser.TEXT) {
+                      
+                  }
+                  eventType = xpp.next();
+                 }
+                 System.out.println("End document");
+          	   }
+          	   catch(Exception e)
+          	   {
+          		   e.printStackTrace();
+          	   }
+          	   
+          	   for(int i=0;i<documentId.size();i++)
+          	   {
+          		   String url="http://ve1.zoomifier.net/"+id+"/"+documentId.get(i)+"/ipad/Page1Thb.jpg";
+          		   secondListImage.add( LoadImageFromWebOperations(url));
+          	   }
+        	   
+        	   
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+
+			super.onProgressUpdate(values);
+
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			progressDialog.dismiss();
+			  NewGridAdapter newAdapter=new NewGridAdapter(GridActivity.this);
+			    popupGridView.setAdapter(newAdapter);
+		
+			
+	}
+
+}
+	
+	
+	
+	
+	
+	
+	//Thread For Document Loading===========================================================================================
+	
+	
+	public class LoadDocument extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			
+			  progressDialog = new ProgressDialog(GridActivity.this);
+			  progressDialog
+			  .setMessage("Please Wait.Downloading your data...");
+			  progressDialog.show();
+			 
+			 
+			
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+              String clientId="109";
+		
+			  String Readerdocument="<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+	   	    			 +"<request>" 
+	   	    	   		 +"<operation opcode=\"GET_READER_DOCUMENTS\">"
+	   	    			 +"<params readerid=\""+readerId+"\" clientid=\""+clientId+"\"/>"
+	   	    	         +"</operation>"
+	   	    			 +"</request>";
+			  String deleteReaderTelnant=
+					  "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+			   	    			 +"<request>" 
+			   	    	   		 +"<operation opcode=\"DELETE_READER_TENANT\">"
+			   	    			 +"<params readerid=\""+readerId+"\" clientid=\""+clientId+"\"/>"
+			   	    	         +"</operation>"
+			   	    			 +"</request>";
+			  
+			  String forgotPassword="<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+	   	    			 +"<request>" 
+	   	    	   		 +"<operation opcode=\"FORGOT_USER_PASSWORD\">"
+	   	    			 +"<params email=\""+"mailparangat@gmail.com"+"\"/>"
+	   	    	         +"</operation>"
+	   	    			 +"</request>";
+			  
+			  
+			  try{
+                     HttpClient httpclient = new DefaultHttpClient();
+                     HttpPost post = new HttpPost("http://ve2.zoomifier.net:8080/PortalInterfaceWS/rest/publishing");
+                     StringEntity str = new StringEntity(forgotPassword);
+                     str.setContentType("application/xml; charset=utf-8");
+                     str.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,"application/xml; charset=utf-8"));
+                     post.setEntity(str);
+                     HttpResponse response = httpclient.execute(post);
+                     HttpEntity entity = response.getEntity();
+                     categoryResponse = EntityUtils.toString(entity);
+                    Log.i("Response For GET_READER_DOCUMENTS=========", categoryResponse);
+                   } catch ( IOException ioe ) {
+                    ioe.printStackTrace();
+                   }
+          	   try{
+                  
+          	    XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                  factory.setNamespaceAware(true);
+                  XmlPullParser xpp = factory.newPullParser();
+                   xpp.setInput( new StringReader (categoryResponse));
+                   String documen=categoryResponse;
+                  int eventType = xpp.getEventType();
+                   while (eventType != XmlPullParser.END_DOCUMENT) {
+                  if(eventType == XmlPullParser.START_DOCUMENT) {
+                      
+                      } else if(eventType == XmlPullParser.START_TAG) {
+                        Log.i("Start tag ",xpp.getName());
+                        if(xpp.getName().equals("categories")){
+                      	
+                         }else if(xpp.getName().equals("category")){
+                        	 
+                      	  /*categoryId.add(xpp.getAttributeValue(0));
+                      	  categoryName.add(xpp.getAttributeValue(1));
+                      	  categoryOrder.add(xpp.getAttributeValue(2));
+                      	  categoryImageid.add(xpp.getAttributeValue(3));*/
+                      	  
+                        }
+                     
+                  }
+                  
+                  else if(eventType == XmlPullParser.END_TAG) {
+                      
+                  } else if(eventType == XmlPullParser.TEXT) {
+                      
+                  }
+                  eventType = xpp.next();
+                 }
+                 System.out.println("End document");
+          	   }
+          	   catch(Exception e)
+          	   {
+          		   e.printStackTrace();
+          	   }
+          	   
+        	   drwable=LoadImageFromWebOperations(documentWebViewUrl);
+        	   
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+
+			super.onProgressUpdate(values);
+
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			progressDialog.dismiss();
+			//NewGridAdapter newAdapter=new NewGridAdapter(GridActivity.this);
+		    //popupGridView.setAdapter(newAdapter);
+			webView.setImageDrawable(drwable);
+		
+			
+	}
+
+}
+
+	
+	public void settingDialog()
+	{
+		settingDialog =new Dialog(GridActivity.this,android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+		settingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    settingDialog.setContentView(R.layout.setting_dialog);
+	    settingDialog.setCanceledOnTouchOutside(false);
+	    settingDialog.getWindow().setGravity(Gravity.TOP|Gravity.RIGHT);
+		settingDialog.getWindow().setLayout(300, 600);
+		
+	}
+	public void init()
+	{
+		settingButton=(Button) findViewById(R.id.setting_button);
+		 signOut=(Button) findViewById(R.id.email_field);
+	}
+	private Drawable LoadImageFromWebOperations(String url){
+ 		try{
+ 			InputStream is = (InputStream) new URL(url).getContent();
+ 			Drawable d = Drawable.createFromStream(is, "drawable");
+ 			String ar="afaf";
+ 			return d;
+ 		}catch (Exception e) {
+ 			System.out.println("Exc="+e);
+ 			return null;
+ 		}
+ 	}
+
+	@Override
+	public void startActivityForResult(Intent intent, int requestCode) {
+		// TODO Auto-generated method stub
+		super.startActivityForResult(intent, requestCode);
+		
+		
+	}
+
+	@Override
+	protected void onRestart() {
+		
+		super.onRestart();
+		if(com.google.zxing.client.android.CaptureActivity.barCode!=null)
+		{
+			Toast.makeText(GridActivity.this, com.google.zxing.client.android.CaptureActivity.barCode, Toast.LENGTH_LONG).show();
+		}
+		
+	}
+	
+	
+	
+}
+	/*@Override
+	public void onBackPressed() {
+		//super.onBackPressed();
+		if(popupView.isShown())
+		{
+			popupView.setVisibility(View.GONE);
+			
+		}
+		else if(webView_layout.isShown())
+		{
+			webView_layout.setVisibility(View.GONE);
+		}
+		else 
+		{
+			finish();
+		}
+	}
+	*/
+	
+
